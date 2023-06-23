@@ -1,6 +1,7 @@
 import Web3 from "web3";
 import { setGlobalState, getGlobalState, setAlert } from "./store";
 import abi from "./abis/Mintraribles.json";
+import Mintraribles from "./artifacts/contracts/Mintraribles.sol/Mintraribles.json";
 
 const { ethereum } = window;
 window.web3 = new Web3(ethereum);
@@ -12,10 +13,15 @@ const getEtheriumContract = async () => {
   if (connectedAccount) {
     const web3 = window.web3;
     const networkId = await web3.eth.net.getId();
-    const networkData = abi.networks[networkId];
-
-    if (networkData) {
-      const contract = new web3.eth.Contract(abi.abi, networkData.address);
+    // const networkData = abi.networks[networkId];
+    // console.log(networkId, networkData);
+    if (networkId) {
+      const contract = new web3.eth.Contract(
+        Mintraribles.abi,
+        "0xc22859e37a741291a93932a412beB88cbA845229"
+      );
+      // console.log("contract connected", networkData.address);
+      console.log(contract);
       return contract;
     } else {
       return null;
@@ -55,6 +61,8 @@ const isWallectConnected = async () => {
       alert("Please connect wallet.");
       console.log("No accounts found.");
     }
+    const contract = await getEtheriumContract();
+    console.log(contract);
   } catch (error) {
     reportError(error);
   }
@@ -93,6 +101,7 @@ const mintNFT = async ({ title, description, metadataURI, price }) => {
   try {
     price = window.web3.utils.toWei(price.toString(), "ether");
     const contract = await getEthereumContract();
+    console.log("my contract", contract);
     const connectedAccount = getGlobalState("connectedAccount");
     const mintPrice = window.web3.utils.toWei("0.01", "ether");
 
@@ -104,6 +113,11 @@ const mintNFT = async ({ title, description, metadataURI, price }) => {
   } catch (error) {
     reportError(error);
   }
+};
+
+const getContract = async () => {
+  const contract = await getEthereumContract();
+  console.log("contract called", contract);
 };
 
 const buyNFT = async ({ id, cost }) => {
@@ -143,6 +157,7 @@ export {
   getAllNFTs,
   connectWallet,
   mintNFT,
+  getContract,
   buyNFT,
   updateNFT,
   isWallectConnected,
