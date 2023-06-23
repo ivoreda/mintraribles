@@ -14,7 +14,6 @@ const getEtheriumContract = async () => {
     const web3 = window.web3;
     const networkId = await web3.eth.net.getId();
     // const networkData = abi.networks[networkId];
-    // console.log(networkId, networkData);
     if (networkId) {
       const contract = new web3.eth.Contract(
         Mintraribles.abi,
@@ -36,6 +35,27 @@ const connectWallet = async () => {
     if (!ethereum) return alert("Please install Metamask");
     const accounts = await ethereum.request({ method: "eth_requestAccounts" });
     setGlobalState("connectedAccount", accounts[0].toLowerCase());
+  } catch (error) {
+    reportError(error);
+  }
+};
+const mintNFT = async ({ title, description, metadataURI, price }) => {
+  try {
+    price = window.web3.utils.toWei(price.toString(), "ether");
+
+    // const contract = await getContract();
+
+    const contract = await getEtheriumContract();
+
+    // console.log("my contract", contract);
+    const connectedAccount = getGlobalState("connectedAccount");
+    const mintPrice = window.web3.utils.toWei("0.01", "ether");
+    console.log(title, description, metadataURI, price);
+    await contract.methods
+      .payToMint(title, description, metadataURI, price)
+      .send({ from: connectedAccount, value: mintPrice });
+
+    return true;
   } catch (error) {
     reportError(error);
   }
@@ -97,27 +117,10 @@ const getAllNFTs = async () => {
   }
 };
 
-const mintNFT = async ({ title, description, metadataURI, price }) => {
-  try {
-    price = window.web3.utils.toWei(price.toString(), "ether");
-    const contract = await getEthereumContract();
-    console.log("my contract", contract);
-    const connectedAccount = getGlobalState("connectedAccount");
-    const mintPrice = window.web3.utils.toWei("0.01", "ether");
-
-    await contract.methods
-      .payToMint(title, description, metadataURI, price)
-      .send({ from: connectedAccount, value: mintPrice });
-
-    return true;
-  } catch (error) {
-    reportError(error);
-  }
-};
-
 const getContract = async () => {
   const contract = await getEthereumContract();
   console.log("contract called", contract);
+  return contract;
 };
 
 const buyNFT = async ({ id, cost }) => {

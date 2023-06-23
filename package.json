@@ -9,6 +9,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "hardhat": "^2.16.0",
     "ipfs-http-client": "^60.0.1",
     "react": "^17.0.2",
