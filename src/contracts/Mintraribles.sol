@@ -37,14 +37,9 @@ contract Mintraribles is ERC721Enumerable, Ownable {
     TransactionStruct[] transactions;
     TransactionStruct[] minted;
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        uint256 _royalityFee,
-        address _artist
-    ) ERC721(_name, _symbol) {
-        royalityFee = _royalityFee;
-        artist = _artist;
+    constructor() ERC721("WasiPunk", "WIP") {
+        royalityFee = 2;
+        artist = 0x78B15fe96C6eB2fF289AdD959783430076740CA0;
     }
 
     function payToMint(
@@ -52,11 +47,10 @@ contract Mintraribles is ERC721Enumerable, Ownable {
         string memory description,
         string memory metadataURI,
         uint256 salesPrice
-    ) external payable {
+    ) public payable {
         require(msg.value >= cost, "Ether too low for minting!");
         require(existingURIs[metadataURI] == 0, "This NFT is already minted!");
         require(msg.sender != owner(), "Sales not allowed!");
-
 
         uint256 royality = (msg.value * royalityFee) / 100;
         payTo(artist, royality);
@@ -76,13 +70,7 @@ contract Mintraribles is ERC721Enumerable, Ownable {
             )
         );
 
-        emit Sale(
-            supply,
-            msg.sender,
-            msg.value,
-            metadataURI,
-            block.timestamp
-        );
+        emit Sale(supply, msg.sender, msg.value, metadataURI, block.timestamp);
 
         _safeMint(msg.sender, supply);
         existingURIs[metadataURI] = 1;
@@ -90,7 +78,10 @@ contract Mintraribles is ERC721Enumerable, Ownable {
     }
 
     function payToBuy(uint256 id) external payable {
-        require(msg.value >= minted[id - 1].cost, "Ether too low for purchase!");
+        require(
+            msg.value >= minted[id - 1].cost,
+            "Ether too low for purchase!"
+        );
         require(msg.sender != minted[id - 1].owner, "Operation Not Allowed!");
 
         uint256 royality = (msg.value * royalityFee) / 100;
@@ -139,11 +130,17 @@ contract Mintraribles is ERC721Enumerable, Ownable {
         return minted;
     }
 
-    function getNFT(uint256 id) external view returns (TransactionStruct memory) {
+    function getNFT(
+        uint256 id
+    ) external view returns (TransactionStruct memory) {
         return minted[id - 1];
     }
 
-    function getAllTransactions() external view returns (TransactionStruct[] memory) {
+    function getAllTransactions()
+        external
+        view
+        returns (TransactionStruct[] memory)
+    {
         return transactions;
     }
 }

@@ -31,7 +31,7 @@ const CreateNFT = () => {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
+  const [fileUrl, setFileUrl] = useState(""); // saving file in this state
   const [imgBase64, setImgBase64] = useState(null);
 
   const [cid, setCid] = useState("");
@@ -83,7 +83,8 @@ const CreateNFT = () => {
       // const created = await client.add(fileUrl);
 
       const path = await uploadFileToPinata(File);
-      const metadataURI = `https://ipfs.io/ipfs/${path}`;
+      // const metadataURI = `https://ipfs.io/ipfs/${path}`; // you can not pass this link, it will not load in any of the platforms
+      const metadataURI = `ipfs://${path}/`;
       const nft = { title, price, description, metadataURI };
 
       setLoadingMsg("Intializing transaction...");
