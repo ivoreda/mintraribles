@@ -17,7 +17,7 @@ const getEtheriumContract = async () => {
     if (networkId) {
       const contract = new web3.eth.Contract(
         Mintraribles.abi,
-        "0x0D04d3Eb2707a905dFA1025E03E77733C654FCB0"
+        "0x2a3781FbD4400d6799f8869F6F373D7ead6C9a96"
       );
       // console.log("contract connected", networkData.address);
       console.log(contract);
