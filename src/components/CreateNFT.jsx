@@ -36,14 +36,13 @@ const CreateNFT = () => {
 
   const [cid, setCid] = useState("");
   const [File, setFile] = useState();
+  const pinataEndpoint = "https://api.pinata.cloud/pinning/pinFileToIPFS";
+  const pinataApiKey = "55409c1f08ae49227e03";
+  const pinataSecretApiKey =
+    "6f44a6a4971191913b06c6330e0dfa63476f6fa17d00e57a5ae1b752caae6523";
 
   async function uploadFileToPinata(file) {
     try {
-      const pinataEndpoint = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-      const pinataApiKey = "55409c1f08ae49227e03";
-      const pinataSecretApiKey =
-        "6f44a6a4971191913b06c6330e0dfa63476f6fa17d00e57a5ae1b752caae6523";
-
       const formData = new FormData();
       formData.append("file", file);
 
@@ -73,6 +72,28 @@ const CreateNFT = () => {
     }
   }
 
+  async function pinJSONToIPFS(title, description, imagePath) {
+    const json = {
+      title: title,
+      description: description,
+      image: imagePath,
+    };
+
+    const response = await axios.post(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      json,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          pinata_api_key: pinataApiKey,
+          pinata_secret_api_key: pinataSecretApiKey,
+        },
+      }
+    );
+
+    return response.data.IpfsHash;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,18 +106,21 @@ const CreateNFT = () => {
       // const created = await client.add(fileUrl);
 
       const path = await uploadFileToPinata(File);
-      // const metadataURI = `https://ipfs.io/ipfs/${path}`; // you can not pass this link, it will not load in any of the platforms
+
       const metadataURI = `ipfs://${path}`;
 
-      const nft = { title, price, description, metadataURI };
+      const base = await pinJSONToIPFS(title, description, metadataURI);
+
+      const baseURI = `https://gateway.pinata.cloud/ipfs/${base}`;
+
+      console.log(baseURI);
 
       setLoadingMsg("Intializing transaction...");
-      setFileUrl(metadataURI);
-      console.log(nft);
-      await createMint();
-      // resetForm();
+      setFileUrl(baseURI);
+      await mintNFT(title, "MTK", baseURI, price);
+      resetForm();
       setAlert("Minting completed...", "green");
-      // window.location.reload();
+      window.location.reload();
     } catch (error) {
       console.log("Error uploading file: ", error);
       setAlert("Minting failed...", "red");

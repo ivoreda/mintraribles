@@ -14,12 +14,15 @@ contract MyNFT is ERC721 {
     // total number of tokenIds minted
     uint256 public tokenIds;
 
+    uint public price
     constructor(
         string memory baseURI,
         string memory tokenName,
-        string memory short
+        string memory short,
+        uint _price
     ) ERC721(tokenName, short) {
         _baseTokenURI = baseURI;
+        price = _price;
         mint();
     }
 
@@ -30,6 +33,10 @@ contract MyNFT is ERC721 {
         _safeMint(msg.sender, tokenIds);
     }
 
+    function getPrice() public returns(uint) {
+        return price;
+    }
+    
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseTokenURI;
     }

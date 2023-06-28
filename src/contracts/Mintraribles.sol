@@ -48,7 +48,7 @@ contract Mintraribles {
         uint salesPrice
     ) public payable {
         require(msg.value >= cost, "Ether too low for minting!");
-        MyNFT mynft = new MyNFT(baseURI, name, shortN);
+        MyNFT mynft = new MyNFT(baseURI, name, shortN, salesPrice);
         OwnerOfNft[address(mynft)] = msg.sender;
 
         minted.push(
