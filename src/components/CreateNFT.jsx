@@ -120,7 +120,7 @@ const CreateNFT = () => {
       await mintNFT(title, "MTK", baseURI, price);
       resetForm();
       setAlert("Minting completed...", "green");
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.log("Error uploading file: ", error);
       setAlert("Minting failed...", "red");
