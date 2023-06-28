@@ -59,7 +59,9 @@ const CreateNFT = () => {
       if (response.status === 200) {
         console.log("File uploaded successfully!");
         setCid(response.data.IpfsHash);
+
         console.log("IPFS hash:", response.data.IpfsHash);
+
         return response.data.IpfsHash;
       } else {
         console.log("File upload failed.");
@@ -84,13 +86,14 @@ const CreateNFT = () => {
 
       const path = await uploadFileToPinata(File);
       // const metadataURI = `https://ipfs.io/ipfs/${path}`; // you can not pass this link, it will not load in any of the platforms
-      const metadataURI = `ipfs://${path}/`;
+      const metadataURI = `ipfs://${path}`;
+
       const nft = { title, price, description, metadataURI };
 
       setLoadingMsg("Intializing transaction...");
       setFileUrl(metadataURI);
       console.log(nft);
-      await mintNFT(nft);
+      await createMint();
       // resetForm();
       setAlert("Minting completed...", "green");
       // window.location.reload();
