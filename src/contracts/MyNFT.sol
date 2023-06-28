@@ -8,35 +8,35 @@ contract MyNFT is ERC721 {
 
     string public _baseTokenURI;
 
-    // max number of LW3Punks
     uint256 public maxTokenIds = 1;
 
-    // total number of tokenIds minted
     uint256 public tokenIds;
 
-    uint public price
+    uint public price;
+
     constructor(
         string memory baseURI,
         string memory tokenName,
         string memory short,
-        uint _price
+        uint _price,
+        address addr
     ) ERC721(tokenName, short) {
         _baseTokenURI = baseURI;
         price = _price;
-        mint();
+        mint(addr);
     }
 
-    function mint() public {
+    function mint(address addr) internal {
         require(tokenIds <= maxTokenIds, "Exceed maximum token supply");
         // require(msg.value >= _price, "Ether sent is not correct");
         tokenIds += 1;
-        _safeMint(msg.sender, tokenIds);
+        _safeMint(addr, tokenIds);
     }
 
-    function getPrice() public returns(uint) {
+    function getPrice() public view returns (uint) {
         return price;
     }
-    
+
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseTokenURI;
     }

@@ -13,7 +13,7 @@ contract Mintraribles {
     address public artist;
     uint256 public royalityFee;
     uint256 public totalTx = 0;
-    uint256 public cost = 0.0001 ether;
+    // uint256 public cost = 0.0001 ether;
 
     event Sale(
         uint256 id,
@@ -41,16 +41,18 @@ contract Mintraribles {
         artist = 0x78B15fe96C6eB2fF289AdD959783430076740CA0;
     }
 
+    address[] public nftContracts;
+
     function createMint(
         string memory baseURI,
         string memory name,
         string memory shortN,
         uint salesPrice
-    ) public payable {
-        require(msg.value >= cost, "Ether too low for minting!");
-        MyNFT mynft = new MyNFT(baseURI, name, shortN, salesPrice);
+    ) public {
+        // require(msg.value >= cost, "Ether too low for minting!");
+        MyNFT mynft = new MyNFT(baseURI, name, shortN, salesPrice, msg.sender);
         OwnerOfNft[address(mynft)] = msg.sender;
-
+        nftContracts.push(address(mynft));
         minted.push(
             TransactionStruct(
                 msg.sender,
