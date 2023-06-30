@@ -10,7 +10,7 @@ contract Mintraribles {
     mapping(string => uint8) existingURIs;
     mapping(uint256 => address) public holderOf;
 
-    address public artist;
+    mapping(address => address) public artists;
     uint256 public royalityFee;
     uint256 public totalTx = 0;
     // uint256 public cost = 0.0001 ether;
@@ -25,9 +25,9 @@ contract Mintraribles {
 
     struct TransactionStruct {
         address owner;
+        address newOwner;
         uint256 cost;
-        string title;
-        string metadataURI;
+        string metadata;
         uint256 timestamp;
     }
 
@@ -35,10 +35,10 @@ contract Mintraribles {
     TransactionStruct[] minted;
 
     mapping(address => address) public OwnerOfNft;
+    mapping(address => uint) public prices;
 
     constructor() {
         royalityFee = 2;
-        artist = 0x78B15fe96C6eB2fF289AdD959783430076740CA0;
     }
 
     address[] public nftContracts;
@@ -48,102 +48,71 @@ contract Mintraribles {
         string memory name,
         string memory shortN,
         uint salesPrice
-    ) public {
+    ) public returns (address) {
         // require(msg.value >= cost, "Ether too low for minting!");
-        MyNFT mynft = new MyNFT(baseURI, name, shortN, salesPrice, msg.sender);
+        MyNFT mynft = new MyNFT(baseURI, name, shortN, msg.sender);
         OwnerOfNft[address(mynft)] = msg.sender;
+        prices[address(mynft)] = salesPrice;
+        artists[address(mynft)] = msg.sender;
         nftContracts.push(address(mynft));
+        string memory metadataURI = mynft.tokenURI(1);
         minted.push(
             TransactionStruct(
                 msg.sender,
+                msg.sender,
                 salesPrice,
-                name,
-                baseURI,
+                metadataURI,
                 block.timestamp
             )
         );
+
+        return address(mynft);
 
         // uint256 royality = (msg.value * royalityFee) / 100;
         // payTo(artist, royality);
         // payTo(owner(), (msg.value - royality));
     }
 
-    // function payToMint(
-    //     string memory title,
-    //     string memory description,
-    //     string memory metadataURI,
-    //     uint256 salesPrice
-    // ) public payable {
-    //     require(msg.value >= cost, "Ether too low for minting!");
-    //     require(existingURIs[metadataURI] == 0, "This NFT is already minted!");
-    //     require(msg.sender != owner(), "Sales not allowed!");
+    function payToBuy(address contractAddr, uint amount) external payable {
+        require(
+            msg.value >= prices[contractAddr],
+            "Ether too low for purchase!"
+        );
+        require(msg.sender != OwnerOfNft[contractAddr], "You are the owner");
 
-    //     uint256 royality = (msg.value * royalityFee) / 100;
-    // payTo(artist, royality);
-    // payTo(owner(), (msg.value - royality));
+        uint256 royality = (msg.value * royalityFee) / 100;
+        payTo(artists[contractAddr], royality);
+        payTo(msg.sender, (msg.value - royality));
 
-    //     supply++;
+        totalTx++;
+        string memory metadataURI = MyNFT(contractAddr).tokenURI(1);
 
-    //     minted.push(
-    //         TransactionStruct(
-    //             supply,
-    //             msg.sender,
-    //             salesPrice,
-    //             title,
-    //             description,
-    //             metadataURI,
-    //             block.timestamp
-    //         )
-    //     );
+        transactions.push(
+            TransactionStruct(
+                OwnerOfNft[contractAddr],
+                msg.sender,
+                amount,
+                metadataURI,
+                block.timestamp
+            )
+        );
 
-    //     emit Sale(supply, msg.sender, msg.value, metadataURI, block.timestamp);
+        emit Sale(totalTx, msg.sender, msg.value, metadataURI, block.timestamp);
 
-    //     _safeMint(msg.sender, supply);
-    //     existingURIs[metadataURI] = 1;
-    //     holderOf[supply] = msg.sender;
-    // }
+        OwnerOfNft[contractAddr] = msg.sender;
+    }
 
-    // function payToBuy(uint256 id) external payable {
-    //     require(
-    //         msg.value >= minted[id - 1].cost,
-    //         "Ether too low for purchase!"
-    //     );
-    //     require(msg.sender != minted[id - 1].owner, "Operation Not Allowed!");
-
-    //     uint256 royality = (msg.value * royalityFee) / 100;
-    //     payTo(artist, royality);
-    //     payTo(minted[id - 1].owner, (msg.value - royality));
-
-    //     totalTx++;
-
-    //     transactions.push(
-    //         TransactionStruct(
-    //             totalTx,
-    //             msg.sender,
-    //             msg.value,
-    //             minted[id - 1].title,
-    //             minted[id - 1].description,
-    //             minted[id - 1].metadataURI,
-    //             block.timestamp
-    //         )
-    //     );
-
-    //     emit Sale(
-    //         totalTx,
-    //         msg.sender,
-    //         msg.value,
-    //         minted[id - 1].metadataURI,
-    //         block.timestamp
-    //     );
-
-    //     minted[id - 1].owner = msg.sender;
-    // }
-
-    function changePrice(uint256 id, uint256 newPrice) external returns (bool) {
+    function changePrice(
+        address nftContract,
+        uint256 newPrice
+    ) public returns (bool) {
         require(newPrice > 0 ether, "Ether too low!");
-        require(msg.sender == minted[id - 1].owner, "Operation Not Allowed!");
+        require(
+            msg.sender == OwnerOfNft[nftContract],
+            "Operation Not Allowed!"
+        );
 
-        minted[id - 1].cost = newPrice;
+        prices[nftContract] = newPrice;
         return true;
     }
 

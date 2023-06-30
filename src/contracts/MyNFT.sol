@@ -18,11 +18,9 @@ contract MyNFT is ERC721 {
         string memory baseURI,
         string memory tokenName,
         string memory short,
-        uint _price,
         address addr
     ) ERC721(tokenName, short) {
         _baseTokenURI = baseURI;
-        price = _price;
         mint(addr);
     }
 
@@ -31,10 +29,6 @@ contract MyNFT is ERC721 {
         // require(msg.value >= _price, "Ether sent is not correct");
         tokenIds += 1;
         _safeMint(addr, tokenIds);
-    }
-
-    function getPrice() public view returns (uint) {
-        return price;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
