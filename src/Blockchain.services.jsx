@@ -84,20 +84,12 @@ const fetchNFT = async () => {
     });
 
     let nftsData = [];
-    // const contracts = await getEtheriumContract();
     response.jsonResponse.result.forEach(async (nft) => {
       if (nft.metadata) {
-        // Parse metadata from string to object
         const metadata = JSON.parse(nft.metadata);
-
-        // Update metadata in nft to be an object
         nft.metadata = metadata;
 
         if (metadata.image) {
-          // const temp = await contracts.methods
-          //   .getPrice(nft.token_address)
-          //   .call();
-          // const mintPrice = window.web3.utils.fromWei(temp, "ether");
           const ipfsHash = metadata.image.replace("ipfs://", "");
           const ipfsUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
           nftsData.push({
@@ -133,13 +125,10 @@ const fetchPrices = async (nftsData) => {
       owner: nftt.owner_of,
       price: mintPrice,
     });
-
-    // console.log(mintPrice);
   });
   setGlobalState("nfts", TempnftsData);
 
   return TempnftsData;
-  // console.log(TempnftsData);
 };
 
 const mintNFT = async (title, ShortName, metadataURI, price) => {
