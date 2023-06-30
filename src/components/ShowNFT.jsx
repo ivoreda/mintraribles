@@ -1,6 +1,6 @@
 import Identicon from "react-identicons";
 import { FaTimes } from "react-icons/fa";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   useGlobalState,
   setGlobalState,
@@ -8,13 +8,20 @@ import {
   setAlert,
   getGlobalState,
 } from "../store";
-import { buyNFT, getPriceOfNft } from "../Blockchain.services";
+import {
+  buyNFT,
+  removeFromSale,
+  getPriceOfNft,
+  fetchNFT,
+  putOnSale,
+} from "../Blockchain.services";
 
 const ShowNFT = () => {
   const [showModal] = useGlobalState("showModal");
   const [connectedAccount] = useGlobalState("connectedAccount");
   const [nft] = useGlobalState("nft");
   const [account] = useGlobalState("connectedAccount");
+  const [priceof, setpriceof] = useState();
 
   const onChangePrice = () => {
     setGlobalState("showModal", "scale-0");
@@ -37,6 +44,22 @@ const ShowNFT = () => {
       setAlert("Purchase failed...", "red");
     }
   };
+
+  const handlePutOnSale = () => {
+    onChangePrice();
+  };
+
+  const handleRemove = () => {};
+
+  useEffect(async () => {
+    // await fetchNFT();
+    // if (nft.token_address === undefined) {
+    //   const temp = getPriceOfNft(nft.token_address);
+    //   const mintPrice = window.web3.utils.fromWei(temp, "ether");
+    //   setpriceof(mintPrice);
+    // }
+    console.log(nft);
+  }, []);
 
   return (
     <div
@@ -88,33 +111,66 @@ const ShowNFT = () => {
 
               <div className="flex flex-col">
                 <small className="text-xs">Current Price</small>
-                <p className="text-sm font-semibold">12 ETH</p>
+                <p className="text-sm font-semibold">
+                  {nft?.price === -1 ? <>NaN</> : <>{nft?.price} ETH</>}
+                </p>
               </div>
             </div>
           </div>
           <div className="flex justify-between items-center space-x-2">
             {connectedAccount == nft?.owner ? (
-              <button
-                className="flex flex-row justify-center items-center
+              nft?.price !== -1 ? (
+                <>
+                  <button
+                    className="flex flex-row justify-center items-center
                 w-full text-[#e32970] text-md border-[#e32970]
                 py-2 px-5 rounded-full bg-transparent
                 drop-shadow-xl border hover:bg-[#bd255f]
                 hover:bg-transparent hover:text-white
                 hover:border hover:border-[#bd255f]
                 focus:outline-none focus:ring mt-5"
-                onClick={onChangePrice}
-              >
-                Change Price
-              </button>
+                    onClick={onChangePrice}
+                  >
+                    Change Price
+                  </button>
+                  <button
+                    className="flex flex-row justify-center items-center
+                  w-full text-[#e32970] text-md border-[#e32970]
+                  py-2 px-5 rounded-full bg-transparent
+                  drop-shadow-xl border hover:bg-[#bd255f]
+                  hover:bg-transparent hover:text-white
+                  hover:border hover:border-[#bd255f]
+                  focus:outline-none focus:ring mt-5"
+                    onClick={() => {
+                      removeFromSale(nft.token_address);
+                    }}
+                  >
+                    Remove From Sale
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="flex flex-row justify-center items-center
+                w-full text-[#e32970] text-md border-[#e32970]
+                py-2 px-5 rounded-full bg-transparent
+                drop-shadow-xl border hover:bg-[#bd255f]
+                hover:bg-transparent hover:text-white
+                hover:border hover:border-[#bd255f]
+                focus:outline-none focus:ring mt-5"
+                  onClick={handlePutOnSale}
+                >
+                  Put On Sale
+                </button>
+              )
             ) : (
               <button
                 className="flex flex-row justify-center items-center
-                w-full text-white text-md bg-[#e32970]
-                hover:bg-[#bd255f] py-2 px-5 rounded-full
-                drop-shadow-xl border border-transparent
-                hover:bg-transparent hover:text-[#e32970]
-                hover:border hover:border-[#bd255f]
-                focus:outline-none focus:ring mt-5"
+              w-full text-white text-md bg-[#e32970]
+              hover:bg-[#bd255f] py-2 px-5 rounded-full
+              drop-shadow-xl border border-transparent
+              hover:bg-transparent hover:text-[#e32970]
+              hover:border hover:border-[#bd255f]
+              focus:outline-none focus:ring mt-5"
                 onClick={handleNFTPurchase}
               >
                 Purchase Now

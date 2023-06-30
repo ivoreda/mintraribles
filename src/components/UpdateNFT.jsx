@@ -7,7 +7,7 @@ import {
 import { updateNFT } from "../Blockchain.services";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
-
+import { changePrice, putOnSale } from "../Blockchain.services";
 const UpdateNFT = () => {
   const [modal] = useGlobalState("updateModal");
   const [nft] = useGlobalState("nft");
@@ -15,20 +15,30 @@ const UpdateNFT = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!price || price <= 0) return;
 
-    setGlobalState("modal", "scale-0");
-    setGlobalState("loading", {
-      show: true,
-      msg: "Initiating price update...",
-    });
-
     try {
+      if (nft.price === -1) {
+        await putOnSale(price, nft.token_address, nft.metadata.image);
+        setGlobalState("modal", "scale-0");
+        setGlobalState("loading", {
+          show: true,
+          msg: "Putting On Sale...",
+        });
+      } else {
+        await changePrice(nft.token_address, price);
+        setGlobalState("modal", "scale-0");
+        setGlobalState("loading", {
+          show: true,
+          msg: "Initiating price update...",
+        });
+      }
+
       setLoadingMsg("Price updating...");
       setGlobalState("updateModal", "scale-0");
 
-      await updateNFT({ ...nft, cost: price });
-      setAlert("Price updated...", "green");
+      setAlert("Succesfully...", "green");
       window.location.reload();
     } catch (error) {
       console.log("Error updating file: ", error);
@@ -80,19 +90,35 @@ const UpdateNFT = () => {
             />
           </div>
 
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="flex flex-row justify-center items-center
+          {nft?.price === -1 ? (
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="flex flex-row justify-center items-center
+            w-full text-white text-md bg-[#e32970]
+            hover:bg-[#bd255f] py-2 px-5 rounded-full
+            drop-shadow-xl border border-transparent
+            hover:bg-transparent hover:text-[#e32970]
+            hover:border hover:border-[#bd255f]
+            focus:outline-none focus:ring mt-5"
+            >
+              Put On Sale
+            </button>
+          ) : (
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="flex flex-row justify-center items-center
               w-full text-white text-md bg-[#e32970]
               hover:bg-[#bd255f] py-2 px-5 rounded-full
               drop-shadow-xl border border-transparent
               hover:bg-transparent hover:text-[#e32970]
               hover:border hover:border-[#bd255f]
               focus:outline-none focus:ring mt-5"
-          >
-            Update Now
-          </button>
+            >
+              Update Now
+            </button>
+          )}
         </form>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { setGlobalState, useGlobalState } from "../store";
-import { fetchNFT } from "../Blockchain.services";
+import { getPriceOfNft, getEtheriumContract } from "../Blockchain.services";
 const Artworks = () => {
   const [nfts] = useGlobalState("nfts");
   const [end, setEnd] = useState(4);
@@ -48,7 +48,20 @@ const Artworks = () => {
 };
 
 const Card = ({ nft }) => {
-  const setNFT = () => {
+  const [contract] = useGlobalState("contract");
+  const [nfts] = useGlobalState("nfts");
+  const setNFT = async () => {
+    console.log(contract, nfts);
+
+    const temp = await contract.methods.getPrice(nft.token_address).call();
+    const mintPrice = window.web3.utils.fromWei(temp, "ether");
+    if (mintPrice === 0 || mintPrice === "0") {
+      nft.price = -1;
+    } else {
+      nft.price = mintPrice;
+    }
+
+    console.log(mintPrice);
     setGlobalState("nft", nft);
     setGlobalState("showModal", "scale-100");
   };
@@ -63,11 +76,6 @@ const Card = ({ nft }) => {
       <h4 className="text-white font-semibold">{nft.metadata.title}</h4>
       <p className="text-gray-400 text-xs my-1">{nft.metadata.description}</p>
       <div className="flex justify-between items-center mt-3 text-white">
-        <div className="flex flex-col">
-          <small className="text-xs">Current Price</small>
-          <p className="text-sm font-semibold">{nft.price}</p>
-        </div>
-
         <button
           className="shadow-lg shadow-black text-white text-sm bg-[#e32970]
             hover:bg-[#bd255f] cursor-pointer rounded-full px-1.5 py-1"

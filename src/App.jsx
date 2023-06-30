@@ -12,9 +12,10 @@ import UpdateNFT from "./components/UpdateNFT";
 import { isWallectConnected, fetchNFT } from "./Blockchain.services";
 import { useGlobalState } from "./store";
 const App = () => {
+  const [nfts] = useGlobalState("nfts");
   useEffect(async () => {
     await isWallectConnected();
-    // await fetchNFT();
+    await fetchNFT();
   }, []);
   return (
     <div className="min-h-screen">

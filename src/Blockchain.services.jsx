@@ -18,7 +18,7 @@ const getEtheriumContract = async () => {
     if (networkId) {
       const contract = new web3.eth.Contract(
         Mintraribles.abi,
-        "0x5410B9792B81384554971d88765b711Aede2371D"
+        "0x8dd0a141F40e67681c88b5145628a49B25fBaaAD"
       );
       // console.log("contract connected", networkData.address);
       console.log(contract);
@@ -31,6 +31,15 @@ const getEtheriumContract = async () => {
   }
 };
 
+const changePrice = async (contractAddr, price) => {
+  const contract = await getEtheriumContract();
+  const mintPrice = window.web3.utils.toWei(price, "ether");
+  const connectedAccount = getGlobalState("connectedAccount");
+  await contract.methods
+    .changePrice(contractAddr, mintPrice)
+    .send({ from: connectedAccount });
+};
+
 const connectWallet = async () => {
   try {
     if (!ethereum) return alert("Please install Metamask");
@@ -40,6 +49,24 @@ const connectWallet = async () => {
   } catch (error) {
     reportError(error);
   }
+};
+
+const putOnSale = async (price, _contractAddr, _metadata) => {
+  const contract = await getEtheriumContract();
+  const priceInWei = window.web3.utils.toWei(price, "ether");
+  const connectedAccount = getGlobalState("connectedAccount");
+  await contract.methods
+    .putOnSale(priceInWei, _contractAddr, _metadata)
+    .send({ from: connectedAccount });
+};
+
+const removeFromSale = async (_contractAddr) => {
+  const contract = await getEtheriumContract();
+  const connectedAccount = getGlobalState("connectedAccount");
+
+  await contract.methods
+    .removeFromSale(_contractAddr)
+    .send({ from: connectedAccount });
 };
 
 const fetchNFT = async () => {
@@ -57,7 +84,7 @@ const fetchNFT = async () => {
     });
 
     let nftsData = [];
-    const contracts = await getEtheriumContract();
+    // const contracts = await getEtheriumContract();
     response.jsonResponse.result.forEach(async (nft) => {
       if (nft.metadata) {
         // Parse metadata from string to object
@@ -67,11 +94,10 @@ const fetchNFT = async () => {
         nft.metadata = metadata;
 
         if (metadata.image) {
-          const temp = await contracts.methods
-            .getPrice(nft.token_address)
-            .call();
-          const mintPrice = window.web3.utils.fromWei(temp, "ether");
-
+          // const temp = await contracts.methods
+          //   .getPrice(nft.token_address)
+          //   .call();
+          // const mintPrice = window.web3.utils.fromWei(temp, "ether");
           const ipfsHash = metadata.image.replace("ipfs://", "");
           const ipfsUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
           nftsData.push({
@@ -79,16 +105,41 @@ const fetchNFT = async () => {
             token_address: nft.token_address,
             image: ipfsUrl,
             owner: nft.owner_of,
-            price: mintPrice,
           });
         }
       }
     });
-    console.log(nftsData);
+    // console.log(nftsData);
+    const temp = await fetchPrices(nftsData);
+    console.log("temp", temp);
     setGlobalState("nfts", nftsData);
   } catch (e) {
     console.error(e);
   }
+};
+
+const fetchPrices = async (nftsData) => {
+  let TempnftsData = [];
+  const contracts = await getEtheriumContract();
+  nftsData.forEach(async (nftt) => {
+    // console.log(nftt);
+    const temp = await contracts.methods.getPrice(nftt.token_address).call();
+    const mintPrice = window.web3.utils.fromWei(temp, "ether");
+
+    TempnftsData.push({
+      metadata: nftt.metadata,
+      token_address: nftt.token_address,
+      image: nftt.image,
+      owner: nftt.owner_of,
+      price: mintPrice,
+    });
+
+    // console.log(mintPrice);
+  });
+  setGlobalState("nfts", TempnftsData);
+
+  return TempnftsData;
+  // console.log(TempnftsData);
 };
 
 const mintNFT = async (title, ShortName, metadataURI, price) => {
@@ -105,7 +156,7 @@ const mintNFT = async (title, ShortName, metadataURI, price) => {
 
     console.log(metadataURI, title, ShortName, salePrice);
     await contract.methods
-      .createMint(metadataURI, title, ShortName, salePrice)
+      .createMint(metadataURI, title, ShortName)
       .send({ from: connectedAccount });
     // .send({ from: connectedAccount, value: mintPrice });  // removed for testing
 
@@ -137,6 +188,7 @@ const isWallectConnected = async () => {
       console.log("No accounts found.");
     }
     const contract = await getEtheriumContract();
+    setGlobalState("contract", contract);
     console.log(contract);
   } catch (error) {
     reportError(error);
@@ -175,8 +227,8 @@ const getAllNFTs = async () => {
 const getPriceOfNft = async (address) => {
   const contract = await getEtheriumContract();
   const price = await contract.methods.getPrice(address);
-  console.log(price.toString());
-  return price.toString();
+  console.log("price", price);
+  return price;
 };
 
 const getContract = async () => {
@@ -233,4 +285,7 @@ export {
   getPriceOfNft,
   getEtheriumContract,
   fetchNFT,
+  putOnSale,
+  changePrice,
+  removeFromSale,
 };
