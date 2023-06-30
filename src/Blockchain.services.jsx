@@ -17,7 +17,7 @@ const getEtheriumContract = async () => {
     if (networkId) {
       const contract = new web3.eth.Contract(
         Mintraribles.abi,
-        "0xbdb2D12Dd28C7Ed07eaB0353105F079d006af546"
+        "0x6c95d950D10E1C3e708677c16d3E4F562400C2a5"
       );
       // console.log("contract connected", networkData.address);
       console.log(contract);
@@ -49,7 +49,7 @@ const mintNFT = async (title, ShortName, metadataURI, price) => {
     const connectedAccount = getGlobalState("connectedAccount");
     const mintPrice = window.web3.utils.toWei("0.0001", "ether");
 
-    const salePrice = window.web3.utils.toWei(price.toString(), "ether");
+    const salePrice = window.web3.utils.toWei(price.toString(), "wei");
 
     console.log(metadataURI, title, ShortName, salePrice);
     await contract.methods

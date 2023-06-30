@@ -102,6 +102,10 @@ contract Mintraribles {
         OwnerOfNft[contractAddr] = msg.sender;
     }
 
+    function getPrice(address addr) public view returns (uint) {
+        return prices[addr];
+    }
+
     function changePrice(
         address nftContract,
         uint256 newPrice
