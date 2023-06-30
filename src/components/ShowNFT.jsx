@@ -1,34 +1,89 @@
-import Identicon from 'react-identicons'
-import { FaTimes } from 'react-icons/fa'
-import { useGlobalState, setGlobalState, truncate, setAlert } from '../store'
-import { buyNFT } from '../Blockchain.services'
-
+import Identicon from "react-identicons";
+import { FaTimes } from "react-icons/fa";
+import { useEffect } from "react";
+import {
+  useGlobalState,
+  setGlobalState,
+  truncate,
+  setAlert,
+  getGlobalState,
+} from "../store";
+import { buyNFT } from "../Blockchain.services";
+import Moralis from "moralis";
 const ShowNFT = () => {
-  const [showModal] = useGlobalState('showModal')
-  const [connectedAccount] = useGlobalState('connectedAccount')
-  const [nft] = useGlobalState('nft')
+  const [showModal] = useGlobalState("showModal");
+  const [connectedAccount] = useGlobalState("connectedAccount");
+  const [nft] = useGlobalState("nft");
+  const [account] = useGlobalState("connectedAccount");
 
   const onChangePrice = () => {
-    setGlobalState('showModal', 'scale-0')
-    setGlobalState('updateModal', 'scale-100')
-  }
+    setGlobalState("showModal", "scale-0");
+    setGlobalState("updateModal", "scale-100");
+  };
+
+  const fetchNFT = async () => {
+    try {
+      await Moralis.start({
+        apiKey:
+          "JtnmcLL0pFYystpVYEGJSe7s6r7pFv7yQn5aQqnFdKZ1WFwuDH7dMmhqVAsZd0mh",
+      });
+
+      const response = await Moralis.EvmApi.nft.getWalletNFTs({
+        chain: "0xaa36a7",
+        format: "decimal",
+        mediaItems: false,
+        address: "0x604Ab8f853eCEeADEDc9C55B9C76a124c2C31EC1",
+      });
+
+      let nftsData = [];
+      console.log(response);
+      response.jsonResponse.result.forEach((nft) => {
+        if (nft.metadata) {
+          // Parse metadata from string to object
+          const metadata = JSON.parse(nft.metadata);
+
+          // Update metadata in nft to be an object
+          nft.metadata = metadata;
+
+          if (metadata.image) {
+            const ipfsHash = metadata.image.replace("ipfs://", "");
+            const ipfsUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+            nftsData.push({
+              metadata: nft.metadata,
+              token_address: nft.token_address,
+              image: ipfsUrl,
+              owner: nft.owner_of,
+            });
+          }
+        }
+      });
+
+      setGlobalState("nfts", nftsData);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleNFTPurchase = async () => {
-    setGlobalState('showModal', 'scale-0')
-    setGlobalState('loading', {
+    setGlobalState("showModal", "scale-0");
+    setGlobalState("loading", {
       show: true,
-      msg: 'Initializing NFT transfer...',
-    })
+      msg: "Initializing NFT transfer...",
+    });
 
     try {
-      await buyNFT(nft)
-      setAlert('Transfer completed...', 'green')
-      window.location.reload()
+      await buyNFT(nft);
+      setAlert("Transfer completed...", "green");
+      window.location.reload();
     } catch (error) {
-      console.log('Error transfering NFT: ', error)
-      setAlert('Purchase failed...', 'red')
+      console.log("Error transfering NFT: ", error);
+      setAlert("Purchase failed...", "red");
     }
-  }
+  };
+
+  useEffect(() => {
+    fetchNFT();
+  }, []);
 
   return (
     <div
@@ -42,7 +97,7 @@ const ShowNFT = () => {
             <p className="font-semibold text-gray-400">Buy NFT</p>
             <button
               type="button"
-              onClick={() => setGlobalState('showModal', 'scale-0')}
+              onClick={() => setGlobalState("showModal", "scale-0")}
               className="border-0 bg-transparent focus:outline-none"
             >
               <FaTimes className="text-gray-400" />
@@ -53,8 +108,8 @@ const ShowNFT = () => {
             <div className="shrink-0 rounded-xl overflow-hidden h-40 w-40">
               <img
                 className="h-full w-full object-cover cursor-pointer"
-                src={nft?.metadataURI}
-                alt={nft?.title}
+                src={nft?.image}
+                alt={nft?.metadata.title}
               />
             </div>
           </div>
@@ -73,14 +128,14 @@ const ShowNFT = () => {
                 <div className="flex flex-col justify-center items-start">
                   <small className="text-white font-bold">@owner</small>
                   <small className="text-pink-800 font-semibold">
-                    {nft?.owner ? truncate(nft.owner, 4, 4, 11) : '...'}
+                    {nft?.owner ? truncate(nft.owner, 4, 4, 11) : "..."}
                   </small>
                 </div>
               </div>
 
               <div className="flex flex-col">
                 <small className="text-xs">Current Price</small>
-                <p className="text-sm font-semibold">{nft?.cost} ETH</p>
+                <p className="text-sm font-semibold">12 ETH</p>
               </div>
             </div>
           </div>
@@ -116,7 +171,7 @@ const ShowNFT = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ShowNFT
+export default ShowNFT;
