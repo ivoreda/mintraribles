@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { setGlobalState, useGlobalState } from "../store";
-
+import { fetchNFT } from "../Blockchain.services";
 const Artworks = () => {
   const [nfts] = useGlobalState("nfts");
   const [end, setEnd] = useState(4);
@@ -14,6 +14,7 @@ const Artworks = () => {
 
   useEffect(() => {
     setCollection(getCollection());
+    // fetchNFT();
   }, [nfts, end]);
 
   return (
@@ -64,7 +65,7 @@ const Card = ({ nft }) => {
       <div className="flex justify-between items-center mt-3 text-white">
         <div className="flex flex-col">
           <small className="text-xs">Current Price</small>
-          <p className="text-sm font-semibold">2 ETH</p>
+          <p className="text-sm font-semibold">{nft.price}</p>
         </div>
 
         <button

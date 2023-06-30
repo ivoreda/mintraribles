@@ -8,8 +8,8 @@ import {
   setAlert,
   getGlobalState,
 } from "../store";
-import { buyNFT } from "../Blockchain.services";
-import Moralis from "moralis";
+import { buyNFT, getPriceOfNft } from "../Blockchain.services";
+
 const ShowNFT = () => {
   const [showModal] = useGlobalState("showModal");
   const [connectedAccount] = useGlobalState("connectedAccount");
@@ -19,49 +19,6 @@ const ShowNFT = () => {
   const onChangePrice = () => {
     setGlobalState("showModal", "scale-0");
     setGlobalState("updateModal", "scale-100");
-  };
-
-  const fetchNFT = async () => {
-    try {
-      await Moralis.start({
-        apiKey:
-          "JtnmcLL0pFYystpVYEGJSe7s6r7pFv7yQn5aQqnFdKZ1WFwuDH7dMmhqVAsZd0mh",
-      });
-
-      const response = await Moralis.EvmApi.nft.getWalletNFTs({
-        chain: "0xaa36a7",
-        format: "decimal",
-        mediaItems: false,
-        address: "0x604Ab8f853eCEeADEDc9C55B9C76a124c2C31EC1",
-      });
-
-      let nftsData = [];
-      console.log(response);
-      response.jsonResponse.result.forEach((nft) => {
-        if (nft.metadata) {
-          // Parse metadata from string to object
-          const metadata = JSON.parse(nft.metadata);
-
-          // Update metadata in nft to be an object
-          nft.metadata = metadata;
-
-          if (metadata.image) {
-            const ipfsHash = metadata.image.replace("ipfs://", "");
-            const ipfsUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
-            nftsData.push({
-              metadata: nft.metadata,
-              token_address: nft.token_address,
-              image: ipfsUrl,
-              owner: nft.owner_of,
-            });
-          }
-        }
-      });
-
-      setGlobalState("nfts", nftsData);
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   const handleNFTPurchase = async () => {
@@ -80,10 +37,6 @@ const ShowNFT = () => {
       setAlert("Purchase failed...", "red");
     }
   };
-
-  useEffect(() => {
-    fetchNFT();
-  }, []);
 
   return (
     <div

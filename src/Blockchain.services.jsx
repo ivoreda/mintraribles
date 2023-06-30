@@ -2,6 +2,7 @@ import Web3 from "web3";
 import { setGlobalState, getGlobalState, setAlert } from "./store";
 import abi from "./abis/Mintraribles.json";
 import Mintraribles from "./artifacts/contracts/Mintraribles.sol/Mintraribles.json";
+import Moralis from "moralis";
 
 const { ethereum } = window;
 window.web3 = new Web3(ethereum);
@@ -17,7 +18,7 @@ const getEtheriumContract = async () => {
     if (networkId) {
       const contract = new web3.eth.Contract(
         Mintraribles.abi,
-        "0x6c95d950D10E1C3e708677c16d3E4F562400C2a5"
+        "0x5410B9792B81384554971d88765b711Aede2371D"
       );
       // console.log("contract connected", networkData.address);
       console.log(contract);
@@ -35,10 +36,61 @@ const connectWallet = async () => {
     if (!ethereum) return alert("Please install Metamask");
     const accounts = await ethereum.request({ method: "eth_requestAccounts" });
     setGlobalState("connectedAccount", accounts[0].toLowerCase());
+    // fetchNFT(accounts[0]);
   } catch (error) {
     reportError(error);
   }
 };
+
+const fetchNFT = async () => {
+  const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+  try {
+    await Moralis.start({
+      apiKey:
+        "JtnmcLL0pFYystpVYEGJSe7s6r7pFv7yQn5aQqnFdKZ1WFwuDH7dMmhqVAsZd0mh",
+    });
+    const response = await Moralis.EvmApi.nft.getWalletNFTs({
+      chain: "0xaa36a7",
+      format: "decimal",
+      mediaItems: false,
+      address: accounts[0],
+    });
+
+    let nftsData = [];
+    const contracts = await getEtheriumContract();
+    response.jsonResponse.result.forEach(async (nft) => {
+      if (nft.metadata) {
+        // Parse metadata from string to object
+        const metadata = JSON.parse(nft.metadata);
+
+        // Update metadata in nft to be an object
+        nft.metadata = metadata;
+
+        if (metadata.image) {
+          const temp = await contracts.methods
+            .getPrice(nft.token_address)
+            .call();
+          const mintPrice = window.web3.utils.fromWei(temp, "ether");
+
+          const ipfsHash = metadata.image.replace("ipfs://", "");
+          const ipfsUrl = `https://ipfs.moralis.io:2053/ipfs/${ipfsHash}`;
+          nftsData.push({
+            metadata: nft.metadata,
+            token_address: nft.token_address,
+            image: ipfsUrl,
+            owner: nft.owner_of,
+            price: mintPrice,
+          });
+        }
+      }
+    });
+    console.log(nftsData);
+    setGlobalState("nfts", nftsData);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 const mintNFT = async (title, ShortName, metadataURI, price) => {
   try {
     price = window.web3.utils.toWei(price.toString(), "ether");
@@ -79,6 +131,7 @@ const isWallectConnected = async () => {
 
     if (accounts.length) {
       setGlobalState("connectedAccount", accounts[0].toLowerCase());
+      // fetchNFT(accounts[0]);
     } else {
       alert("Please connect wallet.");
       console.log("No accounts found.");
@@ -119,8 +172,19 @@ const getAllNFTs = async () => {
   }
 };
 
+const getPriceOfNft = async (address) => {
+  const contract = await getEtheriumContract();
+  const price = await contract.methods.getPrice(address);
+  console.log(price.toString());
+  return price.toString();
+};
+
 const getContract = async () => {
-  const contract = await getEthereumContract();
+  const contract = await getEtheriumContract();
+  // const temp = await contract.getPrice(
+  //   "0x8d4cf85d41539fb2967be200d486704ffdc1b8c9"
+  // );
+  // console.log(temp);
   console.log("contract called", contract);
   return contract;
 };
@@ -166,4 +230,7 @@ export {
   buyNFT,
   updateNFT,
   isWallectConnected,
+  getPriceOfNft,
+  getEtheriumContract,
+  fetchNFT,
 };
