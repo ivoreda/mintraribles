@@ -37,9 +37,9 @@ const CreateNFT = () => {
   const [cid, setCid] = useState("");
   const [File, setFile] = useState();
   const pinataEndpoint = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-  const pinataApiKey = "55409c1f08ae49227e03";
+  const pinataApiKey = "52d458d782bf2db34ec4";
   const pinataSecretApiKey =
-    "6f44a6a4971191913b06c6330e0dfa63476f6fa17d00e57a5ae1b752caae6523";
+    "bd7b807f96dc95793fd03e7a9fc2cc62680dc55ea8d3275bc5cc70ec55d8a76c";
 
   async function uploadFileToPinata(file) {
     try {
@@ -120,7 +120,7 @@ const CreateNFT = () => {
       await mintNFT(title, "MTK", baseURI, price);
       resetForm();
       setAlert("Minting completed...", "green");
-      // window.location.reload();
+      window.location.reload();
     } catch (error) {
       console.log("Error uploading file: ", error);
       setAlert("Minting failed...", "red");
@@ -218,7 +218,7 @@ const CreateNFT = () => {
             />
           </div>
 
-          <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
+          {/* <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
             <input
               className="block w-full text-sm
                   text-slate-500 bg-transparent border-0
@@ -232,7 +232,7 @@ const CreateNFT = () => {
               value={price}
               required
             />
-          </div>
+          </div> */}
 
           <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
             <textarea

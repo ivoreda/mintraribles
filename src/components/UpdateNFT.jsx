@@ -26,6 +26,7 @@ const UpdateNFT = () => {
           show: true,
           msg: "Putting On Sale...",
         });
+
       } else {
         await changePrice(nft.token_address, price);
         setGlobalState("modal", "scale-0");
@@ -38,7 +39,7 @@ const UpdateNFT = () => {
       setLoadingMsg("Price updating...");
       setGlobalState("updateModal", "scale-0");
 
-      setAlert("Succesfully...", "green");
+      setAlert("Succesful...", "green");
       window.location.reload();
     } catch (error) {
       console.log("Error updating file: ", error);

@@ -4,6 +4,7 @@ const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   modal: "scale-0",
   updateModal: "scale-0",
   showModal: "scale-0",
+  marketModal: "scale-0",
   alert: { show: false, msg: "", color: "" },
   loading: { show: false, msg: "" },
   connectedAccount: "",

@@ -70,7 +70,11 @@ const ShowNFT = () => {
       <div className="bg-[#151c25] shadow-xl shadow-[#e32970] rounded-xl w-11/12 md:w-2/5 h-7/12 p-6">
         <div className="flex flex-col">
           <div className="flex flex-row justify-between items-center">
-            <p className="font-semibold text-gray-400">Buy NFT</p>
+            {connectedAccount === nft?.owner ? (
+              <p className="font-semibold text-gray-400">NFT Details</p>
+            ) : (
+              <p className="font-semibold text-gray-400">Buy NFT</p>
+            )}
             <button
               type="button"
               onClick={() => setGlobalState("showModal", "scale-0")}
