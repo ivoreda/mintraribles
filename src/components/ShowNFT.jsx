@@ -28,6 +28,21 @@ const ShowNFT = () => {
     setGlobalState("updateModal", "scale-100");
   };
 
+  const onRemoveFromSale = async (nft_addr) => {
+    try {
+      setGlobalState("loading", {
+        show: true,
+        msg: "Removing from sale...",
+      });
+      await removeFromSale(nft.token_address);
+      setGlobalState("showModal", "scale-0");
+      setAlert("Successful...", "green");
+    } catch (error) {
+      console.log("Error updating file: ", error);
+      setAlert("Update failed...", "red");
+    }
+  };
+
   const handleNFTPurchase = async () => {
     setGlobalState("showModal", "scale-0");
     setGlobalState("loading", {
@@ -145,9 +160,7 @@ const ShowNFT = () => {
                   hover:bg-transparent hover:text-white
                   hover:border hover:border-[#bd255f]
                   focus:outline-none focus:ring mt-5"
-                    onClick={() => {
-                      removeFromSale(nft.token_address);
-                    }}
+                    onClick={() => onRemoveFromSale()}
                   >
                     Remove From Sale
                   </button>

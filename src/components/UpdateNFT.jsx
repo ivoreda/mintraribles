@@ -8,6 +8,7 @@ import { updateNFT } from "../Blockchain.services";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { changePrice, putOnSale } from "../Blockchain.services";
+
 const UpdateNFT = () => {
   const [modal] = useGlobalState("updateModal");
   const [nft] = useGlobalState("nft");
@@ -20,26 +21,25 @@ const UpdateNFT = () => {
 
     try {
       if (nft.price === -1) {
-        await putOnSale(price, nft.token_address, nft.metadata.image);
-        setGlobalState("modal", "scale-0");
         setGlobalState("loading", {
           show: true,
           msg: "Putting On Sale...",
         });
-
-      } else {
-        await changePrice(nft.token_address, price);
+        await putOnSale(price, nft.token_address, nft.metadata.image);
         setGlobalState("modal", "scale-0");
+      } else {
         setGlobalState("loading", {
           show: true,
           msg: "Initiating price update...",
         });
+        await changePrice(nft.token_address, price);
+        setGlobalState("updateModal", "scale-0");
       }
 
       setLoadingMsg("Price updating...");
-      setGlobalState("updateModal", "scale-0");
+      setGlobalState("updateModal", "scale-100");
 
-      setAlert("Succesful...", "green");
+      setAlert("Successful...", "green");
       window.location.reload();
     } catch (error) {
       console.log("Error updating file: ", error);

@@ -18,13 +18,11 @@ const router = createBrowserRouter([
   {
     path: "market",
     element: <Market />,
-    children: [
-      {
-        path: "market/nft-details",
-        element: <ShowNFT />,
-      },
-    ],
   },
+  {
+    path: "nft-details",
+    element: <ShowNFT/>
+  }
 ]);
 
 ReactDOM.render(
