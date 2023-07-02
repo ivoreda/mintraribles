@@ -9,12 +9,14 @@ import Loading from "./components/Loading";
 import ShowNFT from "./components/ShowNFT";
 import Transactions from "./components/Transactions";
 import UpdateNFT from "./components/UpdateNFT";
-import { isWallectConnected } from "./Blockchain.services";
-
+import { isWallectConnected, fetchNFT } from "./Blockchain.services";
+import { useGlobalState } from "./store";
 const App = () => {
+  const [nfts] = useGlobalState("nfts");
   useEffect(async () => {
-    await isWallectConnected()
-  }, [])
+    await isWallectConnected();
+    await fetchNFT();
+  }, []);
   return (
     <div className="min-h-screen">
       <div className="gradient-bg-hero">

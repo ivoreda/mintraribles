@@ -1,34 +1,80 @@
-import Identicon from 'react-identicons'
-import { FaTimes } from 'react-icons/fa'
-import { useGlobalState, setGlobalState, truncate, setAlert } from '../store'
-import { buyNFT } from '../Blockchain.services'
+import Identicon from "react-identicons";
+import { FaTimes } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import {
+  useGlobalState,
+  setGlobalState,
+  truncate,
+  setAlert,
+  getGlobalState,
+} from "../store";
+import {
+  buyNFT,
+  removeFromSale,
+  getPriceOfNft,
+  fetchNFT,
+  putOnSale,
+} from "../Blockchain.services";
 
 const ShowNFT = () => {
-  const [showModal] = useGlobalState('showModal')
-  const [connectedAccount] = useGlobalState('connectedAccount')
-  const [nft] = useGlobalState('nft')
+  const [showModal] = useGlobalState("showModal");
+  const [connectedAccount] = useGlobalState("connectedAccount");
+  const [nft] = useGlobalState("nft");
+  const [account] = useGlobalState("connectedAccount");
+  const [priceof, setpriceof] = useState();
 
   const onChangePrice = () => {
-    setGlobalState('showModal', 'scale-0')
-    setGlobalState('updateModal', 'scale-100')
-  }
+    setGlobalState("showModal", "scale-0");
+    setGlobalState("updateModal", "scale-100");
+  };
+
+  const onRemoveFromSale = async (nft_addr) => {
+    try {
+      setGlobalState("loading", {
+        show: true,
+        msg: "Removing from sale...",
+      });
+      await removeFromSale(nft.token_address);
+      setGlobalState("showModal", "scale-0");
+      setAlert("Successful...", "green");
+    } catch (error) {
+      console.log("Error updating file: ", error);
+      setAlert("Update failed...", "red");
+    }
+  };
 
   const handleNFTPurchase = async () => {
-    setGlobalState('showModal', 'scale-0')
-    setGlobalState('loading', {
+    setGlobalState("showModal", "scale-0");
+    setGlobalState("loading", {
       show: true,
-      msg: 'Initializing NFT transfer...',
-    })
+      msg: "Initializing NFT transfer...",
+    });
 
     try {
-      await buyNFT(nft)
-      setAlert('Transfer completed...', 'green')
-      window.location.reload()
+      await buyNFT(nft);
+      setAlert("Transfer completed...", "green");
+      window.location.reload();
     } catch (error) {
-      console.log('Error transfering NFT: ', error)
-      setAlert('Purchase failed...', 'red')
+      console.log("Error transfering NFT: ", error);
+      setAlert("Purchase failed...", "red");
     }
-  }
+  };
+
+  const handlePutOnSale = () => {
+    onChangePrice();
+  };
+
+  const handleRemove = () => {};
+
+  useEffect(async () => {
+    // await fetchNFT();
+    // if (nft.token_address === undefined) {
+    //   const temp = getPriceOfNft(nft.token_address);
+    //   const mintPrice = window.web3.utils.fromWei(temp, "ether");
+    //   setpriceof(mintPrice);
+    // }
+    console.log(nft);
+  }, []);
 
   return (
     <div
@@ -39,10 +85,14 @@ const ShowNFT = () => {
       <div className="bg-[#151c25] shadow-xl shadow-[#e32970] rounded-xl w-11/12 md:w-2/5 h-7/12 p-6">
         <div className="flex flex-col">
           <div className="flex flex-row justify-between items-center">
-            <p className="font-semibold text-gray-400">Buy NFT</p>
+            {connectedAccount === nft?.owner ? (
+              <p className="font-semibold text-gray-400">NFT Details</p>
+            ) : (
+              <p className="font-semibold text-gray-400">Buy NFT</p>
+            )}
             <button
               type="button"
-              onClick={() => setGlobalState('showModal', 'scale-0')}
+              onClick={() => setGlobalState("showModal", "scale-0")}
               className="border-0 bg-transparent focus:outline-none"
             >
               <FaTimes className="text-gray-400" />
@@ -53,8 +103,8 @@ const ShowNFT = () => {
             <div className="shrink-0 rounded-xl overflow-hidden h-40 w-40">
               <img
                 className="h-full w-full object-cover cursor-pointer"
-                src={nft?.metadataURI}
-                alt={nft?.title}
+                src={nft?.image}
+                alt={nft?.metadata.title}
               />
             </div>
           </div>
@@ -73,40 +123,71 @@ const ShowNFT = () => {
                 <div className="flex flex-col justify-center items-start">
                   <small className="text-white font-bold">@owner</small>
                   <small className="text-pink-800 font-semibold">
-                    {nft?.owner ? truncate(nft.owner, 4, 4, 11) : '...'}
+                    {nft?.owner ? truncate(nft.owner, 4, 4, 11) : "..."}
                   </small>
                 </div>
               </div>
 
               <div className="flex flex-col">
                 <small className="text-xs">Current Price</small>
-                <p className="text-sm font-semibold">{nft?.cost} ETH</p>
+                <p className="text-sm font-semibold">
+                  {nft?.price === -1 ? <>NaN</> : <>{nft?.price} ETH</>}
+                </p>
               </div>
             </div>
           </div>
           <div className="flex justify-between items-center space-x-2">
             {connectedAccount == nft?.owner ? (
-              <button
-                className="flex flex-row justify-center items-center
+              nft?.price !== -1 ? (
+                <>
+                  <button
+                    className="flex flex-row justify-center items-center
                 w-full text-[#e32970] text-md border-[#e32970]
                 py-2 px-5 rounded-full bg-transparent
                 drop-shadow-xl border hover:bg-[#bd255f]
                 hover:bg-transparent hover:text-white
                 hover:border hover:border-[#bd255f]
                 focus:outline-none focus:ring mt-5"
-                onClick={onChangePrice}
-              >
-                Change Price
-              </button>
+                    onClick={onChangePrice}
+                  >
+                    Change Price
+                  </button>
+                  <button
+                    className="flex flex-row justify-center items-center
+                  w-full text-[#e32970] text-md border-[#e32970]
+                  py-2 px-5 rounded-full bg-transparent
+                  drop-shadow-xl border hover:bg-[#bd255f]
+                  hover:bg-transparent hover:text-white
+                  hover:border hover:border-[#bd255f]
+                  focus:outline-none focus:ring mt-5"
+                    onClick={() => onRemoveFromSale()}
+                  >
+                    Remove From Sale
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="flex flex-row justify-center items-center
+                w-full text-[#e32970] text-md border-[#e32970]
+                py-2 px-5 rounded-full bg-transparent
+                drop-shadow-xl border hover:bg-[#bd255f]
+                hover:bg-transparent hover:text-white
+                hover:border hover:border-[#bd255f]
+                focus:outline-none focus:ring mt-5"
+                  onClick={handlePutOnSale}
+                >
+                  Put On Sale
+                </button>
+              )
             ) : (
               <button
                 className="flex flex-row justify-center items-center
-                w-full text-white text-md bg-[#e32970]
-                hover:bg-[#bd255f] py-2 px-5 rounded-full
-                drop-shadow-xl border border-transparent
-                hover:bg-transparent hover:text-[#e32970]
-                hover:border hover:border-[#bd255f]
-                focus:outline-none focus:ring mt-5"
+              w-full text-white text-md bg-[#e32970]
+              hover:bg-[#bd255f] py-2 px-5 rounded-full
+              drop-shadow-xl border border-transparent
+              hover:bg-transparent hover:text-[#e32970]
+              hover:border hover:border-[#bd255f]
+              focus:outline-none focus:ring mt-5"
                 onClick={handleNFTPurchase}
               >
                 Purchase Now
@@ -116,7 +197,7 @@ const ShowNFT = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ShowNFT
+export default ShowNFT;

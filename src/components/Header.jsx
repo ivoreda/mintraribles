@@ -1,4 +1,5 @@
-import timelessLogo from "../assets/timeless.png";
+import { Link } from "react-router-dom";
+import mintrariblesLogo from "../assets/logo-raribles.png";
 import { connectWallet } from "../Blockchain.services";
 import { useGlobalState, truncate } from "../store";
 
@@ -7,11 +8,13 @@ const Header = () => {
   return (
     <nav className="w-4/5 flex md:justify-center justify-between items-center py-4 mx-auto">
       <div className="md:flex-[0.5] flex-initial justify-center items-center">
-        <img
-          className="w-32 cursor-pointer"
-          src={timelessLogo}
-          alt="Timeless Logo"
-        />
+        <Link to="/">
+          <img
+            className="w-12 cursor-pointer"
+            src={mintrariblesLogo}
+            alt="mraribles-logo"
+          />
+        </Link>
       </div>
 
       <ul
@@ -19,8 +22,14 @@ const Header = () => {
         hidden list-none flex-row justify-between
         items-center flex-initial"
       >
-        <li className="mx-4 cursor-pointer">Market</li>
-        <li className="mx-4 cursor-pointer">Artist</li>
+        {/* <li className="mx-4 cursor-pointer">Market</li> */}
+        <Link to="/market" className="mx-4 cursor-pointer">
+          Market
+        </Link>
+        <Link to="/market" className="mx-4 cursor-pointer">
+          View all NFTs
+        </Link>
+        {/* <li className="mx-4 cursor-pointer">Artist</li> */}
         <li className="mx-4 cursor-pointer">Features</li>
         <li className="mx-4 cursor-pointer">Community</li>
       </ul>

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { create } from "ipfs-http-client";
 import { mintNFT } from "../Blockchain.services";
+import axios from "axios";
 
 const projectId = "2RXpd8Qi1snxmJ7Z9cXCIxE8C4x";
 const projectSecret = "e7093aeffd5bc58d28a5ab7c30065a1d";
@@ -30,26 +31,94 @@ const CreateNFT = () => {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
+  const [fileUrl, setFileUrl] = useState(""); // saving file in this state
   const [imgBase64, setImgBase64] = useState(null);
 
+  const [cid, setCid] = useState("");
+  const [File, setFile] = useState();
+  const pinataEndpoint = "https://api.pinata.cloud/pinning/pinFileToIPFS";
+  const pinataApiKey = "52d458d782bf2db34ec4";
+  const pinataSecretApiKey =
+    "bd7b807f96dc95793fd03e7a9fc2cc62680dc55ea8d3275bc5cc70ec55d8a76c";
+
+  async function uploadFileToPinata(file) {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post(pinataEndpoint, formData, {
+        maxContentLength: Infinity,
+        headers: {
+          "Content-Type": "multipart/form-data",
+          pinata_api_key: pinataApiKey,
+          pinata_secret_api_key: pinataSecretApiKey,
+        },
+      });
+
+      if (response.status === 200) {
+        console.log("File uploaded successfully!");
+        setCid(response.data.IpfsHash);
+
+        console.log("IPFS hash:", response.data.IpfsHash);
+
+        return response.data.IpfsHash;
+      } else {
+        console.log("File upload failed.");
+        return null;
+      }
+    } catch (error) {
+      console.error("An error occurred during file upload:", error.message);
+      return null;
+    }
+  }
+
+  async function pinJSONToIPFS(title, description, imagePath) {
+    const json = {
+      title: title,
+      description: description,
+      image: imagePath,
+    };
+
+    const response = await axios.post(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      json,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          pinata_api_key: pinataApiKey,
+          pinata_secret_api_key: pinataSecretApiKey,
+        },
+      }
+    );
+
+    return response.data.IpfsHash;
+  }
+
   const handleSubmit = async (e) => {
+    console.log("I am called");
     e.preventDefault();
 
-    if (!title || !price || !description) return;
+    if (!title || !description) return;
 
     setGlobalState("modal", "scale-0");
     setGlobalState("loading", { show: true, msg: "Uploading IPFS data..." });
 
     try {
-      const created = await client.add(fileUrl);
-      const metadataURI = `https://ipfs.io/ipfs/${created.path}`;
-      const nft = { title, price, description, metadataURI };
+      // const created = await client.add(fileUrl);
+
+      const path = await uploadFileToPinata(File);
+
+      const metadataURI = `ipfs://${path}`;
+
+      const base = await pinJSONToIPFS(title, description, metadataURI);
+
+      const baseURI = `https://gateway.pinata.cloud/ipfs/${base}`;
+
+      console.log(baseURI);
 
       setLoadingMsg("Intializing transaction...");
-      setFileUrl(metadataURI);
-      await mintNFT(nft);
-
+      setFileUrl(baseURI);
+      await mintNFT(title, "MTK", baseURI, price);
       resetForm();
       setAlert("Minting completed...", "green");
       window.location.reload();
@@ -58,16 +127,17 @@ const CreateNFT = () => {
       setAlert("Minting failed...", "red");
     }
   };
-
   const changeImage = async (e) => {
-    const reader = new FileReader();
-    if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    // const reader = new FileReader();
+    // if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 
-    reader.onload = (readerEvent) => {
-      const file = readerEvent.target.result;
-      setImgBase64(file);
-      setFileUrl(e.target.files[0]);
-    };
+    // reader.onload = (readerEvent) => {
+    //   const file = readerEvent.target.result;
+    //   setImgBase64(file);
+    //   setFileUrl(e.target.files[0]);
+    // };
+    const file = e.target.files[0];
+    setFile(file);
   };
 
   const closeModal = () => {
@@ -118,9 +188,10 @@ const CreateNFT = () => {
           <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
             <label className="block">
               <span className="sr-only">Choose profile photo</span>
+
               <input
                 type="file"
-                accept="image/png, image/gif, image/jpeg, image/webp"
+                accept=".jpg,.jpeg,.png"
                 className="block w-full text-sm text-slate-500
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
@@ -148,7 +219,7 @@ const CreateNFT = () => {
             />
           </div>
 
-          <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
+          {/* <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
             <input
               className="block w-full text-sm
                   text-slate-500 bg-transparent border-0
@@ -162,7 +233,7 @@ const CreateNFT = () => {
               value={price}
               required
             />
-          </div>
+          </div> */}
 
           <div className="flex flex-row justify-between items-center bg-gray-800 rounded-xl mt-5">
             <textarea
