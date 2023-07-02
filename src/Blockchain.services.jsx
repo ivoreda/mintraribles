@@ -131,9 +131,9 @@ const fetchPrices = async (nftsData) => {
   return TempnftsData;
 };
 
-const mintNFT = async (title, ShortName, metadataURI, price) => {
+const mintNFT = async (title, ShortName, metadataURI) => {
   try {
-    price = window.web3.utils.toWei(price.toString(), "ether");
+    // price = window.web3.utils.toWei(price.toString(), "ether");
 
     const contract = await getEtheriumContract();
 
@@ -141,9 +141,9 @@ const mintNFT = async (title, ShortName, metadataURI, price) => {
     const connectedAccount = getGlobalState("connectedAccount");
     const mintPrice = window.web3.utils.toWei("0.0001", "ether");
 
-    const salePrice = window.web3.utils.toWei(price.toString(), "wei");
+    // const salePrice = window.web3.utils.toWei(price.toString(), "wei");
 
-    console.log(metadataURI, title, ShortName, salePrice);
+    console.log(metadataURI, title, ShortName);
     await contract.methods
       .createMint(metadataURI, title, ShortName)
       .send({ from: connectedAccount });
