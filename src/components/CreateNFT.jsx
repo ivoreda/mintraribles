@@ -95,9 +95,10 @@ const CreateNFT = () => {
   }
 
   const handleSubmit = async (e) => {
+    console.log("I am called");
     e.preventDefault();
 
-    if (!title || !price || !description) return;
+    if (!title || !description) return;
 
     setGlobalState("modal", "scale-0");
     setGlobalState("loading", { show: true, msg: "Uploading IPFS data..." });
