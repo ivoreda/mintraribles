@@ -8,20 +8,28 @@ import ShowNFT from "./ShowNFT";
 import Alert from "./Alert";
 import Loading from "./Loading";
 import UpdateNFT from "./UpdateNFT";
+import { getOnSale, getOnSaleNftPreview } from "../Blockchain.services";
 
 function Market() {
   const [nfts] = useGlobalState("nfts");
+  const [onSale] = useGlobalState("onSale");
+
   const [end, setEnd] = useState(4);
   const [count] = useState(4);
   const [collection, setCollection] = useState([]);
 
   const getCollection = () => {
-    console.log(nfts[0]);
-    return nfts;
+    // console.log(nfts[0]);
+    return onSale;
+  };
+
+  const getNFTPreview = async () => {
+    // await getOnSaleNftPreview();
   };
 
   useEffect(() => {
     setCollection(getCollection());
+    getNFTPreview();
     // fetchNFT();
   }, [nfts, end]);
   return (
@@ -33,7 +41,7 @@ function Market() {
         <div className="bg-[#151c25] gradient-bg-artworks">
           <div className="w-4/5 py-10 mx-auto">
             <h4 className="text-white text-3xl font-bold uppercase text-gradient">
-              {collection.length > 0 ? "Latest Artworks" : "No Artworks Yet"}
+              {collection.length > 0 ? "Marketplace" : "No Artworks Yet"}
             </h4>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-4 lg:gap-3 py-2.5">
@@ -56,7 +64,6 @@ function Market() {
             ) : null}
           </div>
         </div>
-        <Transactions />
 
         <Footer />
       </div>

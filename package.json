@@ -9,6 +9,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@moralisweb3/common-evm-utils": "^2.22.3",
     "axios": "^1.4.0",
     "hardhat": "^2.16.0",
     "ipfs-http-client": "^60.0.1",

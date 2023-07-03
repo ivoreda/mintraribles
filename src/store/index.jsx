@@ -10,8 +10,10 @@ const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   connectedAccount: "",
   nft: null,
   nfts: [],
+  onSale: [],
   transactions: [],
   contract: null,
+  nftContract: null,
 });
 
 const setAlert = (msg, color = "green") => {

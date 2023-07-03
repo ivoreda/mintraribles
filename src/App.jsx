@@ -9,13 +9,19 @@ import Loading from "./components/Loading";
 import ShowNFT from "./components/ShowNFT";
 import Transactions from "./components/Transactions";
 import UpdateNFT from "./components/UpdateNFT";
-import { isWallectConnected, fetchNFT } from "./Blockchain.services";
+import {
+  isWallectConnected,
+  fetchNFT,
+  getOnSaleNftPreview,
+} from "./Blockchain.services";
 import { useGlobalState } from "./store";
 const App = () => {
   const [nfts] = useGlobalState("nfts");
   useEffect(async () => {
     await isWallectConnected();
     await fetchNFT();
+    // await getOnSale();
+    await getOnSaleNftPreview();
   }, []);
   return (
     <div className="min-h-screen">

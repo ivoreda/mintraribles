@@ -14,6 +14,7 @@ import {
   getPriceOfNft,
   fetchNFT,
   putOnSale,
+  getNFTContract,
 } from "../Blockchain.services";
 
 const ShowNFT = () => {
@@ -51,7 +52,7 @@ const ShowNFT = () => {
     });
 
     try {
-      await buyNFT(nft);
+      await buyNFT(nft.token_address, nft.price, nft.owner);
       setAlert("Transfer completed...", "green");
       window.location.reload();
     } catch (error) {
