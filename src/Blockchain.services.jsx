@@ -20,7 +20,7 @@ const getEtheriumContract = async () => {
     if (networkId) {
       const contract = new web3.eth.Contract(
         Mintraribles.abi,
-        "0xeDeECA8e5AA3a56958288539e51eE607aF6Dd956"
+        "0x2a80Ce1c6d192ff6f53516769bB20353AB0c55B5"
       );
       // console.log("contract connected", networkData.address);
       console.log(contract);
@@ -75,11 +75,12 @@ const connectWallet = async () => {
 const putOnSale = async (price, _contractAddr, _metadata) => {
   const nftContract = await getNFTContract(_contractAddr);
   await nftContract.methods
-    .approve("0xeDeECA8e5AA3a56958288539e51eE607aF6Dd956", 1)
+    .approve("0x2a80Ce1c6d192ff6f53516769bB20353AB0c55B5", 1)
     .send({ from: getGlobalState("connectedAccount") });
 
   const contract = await getEtheriumContract();
   const priceInWei = window.web3.utils.toWei(price, "ether");
+  console.log(price, priceInWei);
   const connectedAccount = getGlobalState("connectedAccount");
   await contract.methods
     .putOnSale(priceInWei, _contractAddr, _metadata)
@@ -169,15 +170,14 @@ const mintNFT = async (title, ShortName, metadataURI) => {
 
     // console.log("my contract", contract);
     const connectedAccount = getGlobalState("connectedAccount");
-    const mintPrice = window.web3.utils.toWei("0.0001", "ether");
+    const mintPrice = window.web3.utils.toWei("0.01", "ether");
 
     // const salePrice = window.web3.utils.toWei(price.toString(), "wei");
 
     console.log(metadataURI, title, ShortName);
     await contract.methods
       .createMint(metadataURI, title, ShortName)
-      .send({ from: connectedAccount });
-    // .send({ from: connectedAccount, value: mintPrice });  // removed for testing
+      .send({ from: connectedAccount, value: mintPrice }); // removed for testing
 
     return true;
   } catch (error) {
@@ -319,12 +319,14 @@ const getContract = async () => {
 const buyNFT = async (contractAddr, amount, ownerAddress) => {
   try {
     const cost = window.web3.utils.toWei(amount.toString(), "ether");
+
+    console.log(amount, cost);
     // console.log(cost);
     const contract = await getEtheriumContract();
     const buyer = getGlobalState("connectedAccount");
 
     await contract.methods
-      .payToBuy(contractAddr, cost, ownerAddress)
+      .payToBuy(contractAddr, ownerAddress)
       .send({ from: buyer, value: cost });
 
     return true;

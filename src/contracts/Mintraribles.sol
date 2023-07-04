@@ -15,6 +15,15 @@ contract Mintraribles {
     uint256 public totalTx = 0;
     // uint256 public cost = 0.0001 ether;
 
+    struct OnSale {
+        address owner;
+        uint price;
+        address contractAddr;
+        string metadata;
+    }
+
+    OnSale[] public onSale;
+
     event Sale(
         uint256 id,
         address indexed owner,
@@ -43,16 +52,56 @@ contract Mintraribles {
 
     address[] public nftContracts;
 
+    function putOnSale(
+        uint _price,
+        address _contractAddr,
+        string memory _metadata
+    ) public {
+        require(
+            msg.sender == OwnerOfNft[_contractAddr],
+            "You are not the owner"
+        );
+        prices[_contractAddr] = _price;
+
+        onSale.push(OnSale(msg.sender, _price, _contractAddr, _metadata));
+    }
+
+    function removeFromSale(address _contractAddr) public {
+        require(
+            msg.sender == OwnerOfNft[_contractAddr],
+            "You are not the owner"
+        );
+        for (uint i = 0; i < onSale.length; i++) {
+            if (
+                onSale[i].contractAddr == _contractAddr &&
+                onSale[i].owner == msg.sender
+            ) {
+                delete onSale[i];
+                prices[_contractAddr] = 0;
+                break;
+            }
+        }
+    }
+
+    function getOnSale() public view returns (OnSale[] memory) {
+        return onSale;
+    }
+
     function createMint(
         string memory baseURI,
         string memory name,
-        string memory shortN,
-        uint salesPrice
-    ) public returns (address) {
+        string memory shortN
+    )
+        public
+        returns (
+            // uint salesPrice
+            address
+        )
+    {
         // require(msg.value >= cost, "Ether too low for minting!");
         MyNFT mynft = new MyNFT(baseURI, name, shortN, msg.sender);
         OwnerOfNft[address(mynft)] = msg.sender;
-        prices[address(mynft)] = salesPrice;
+        // prices[address(mynft)] = salesPrice;
         artists[address(mynft)] = msg.sender;
         nftContracts.push(address(mynft));
         string memory metadataURI = mynft.tokenURI(1);
@@ -60,7 +109,7 @@ contract Mintraribles {
             TransactionStruct(
                 msg.sender,
                 msg.sender,
-                salesPrice,
+                0,
                 metadataURI,
                 block.timestamp
             )
@@ -73,7 +122,11 @@ contract Mintraribles {
         // payTo(owner(), (msg.value - royality));
     }
 
-    function payToBuy(address contractAddr, uint amount) external payable {
+    function payToBuy(
+        address contractAddr,
+        uint amount,
+        address ownerOfNFT
+    ) public payable {
         require(
             msg.value >= prices[contractAddr],
             "Ether too low for purchase!"
@@ -86,6 +139,8 @@ contract Mintraribles {
 
         totalTx++;
         string memory metadataURI = MyNFT(contractAddr).tokenURI(1);
+
+        MyNFT(contractAddr).transferFrom(ownerOfNFT, msg.sender, 1);
 
         transactions.push(
             TransactionStruct(
@@ -100,6 +155,14 @@ contract Mintraribles {
         emit Sale(totalTx, msg.sender, msg.value, metadataURI, block.timestamp);
 
         OwnerOfNft[contractAddr] = msg.sender;
+
+        for (uint i = 0; i < onSale.length; i++) {
+            if (onSale[i].contractAddr == contractAddr) {
+                delete onSale[i];
+                prices[contractAddr] = 0;
+                break;
+            }
+        }
     }
 
     function getPrice(address addr) public view returns (uint) {

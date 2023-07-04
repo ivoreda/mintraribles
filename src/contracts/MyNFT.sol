@@ -42,7 +42,6 @@ contract MyNFT is ERC721 {
             _exists(tokenId),
             "ERC721Metadata: URI query for nonexistent token"
         );
-
         string memory baseURI = _baseURI();
         return baseURI;
     }
