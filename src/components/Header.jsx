@@ -23,8 +23,8 @@ const Header = () => {
         items-center flex-initial"
       >
         {/* <li className="mx-4 cursor-pointer">Market</li> */}
-        <Link to="/market" className="mx-4 cursor-pointer">
-          Market
+        <Link to="/" className="mx-4 cursor-pointer">
+          Home
         </Link>
         <Link to="/market" className="mx-4 cursor-pointer">
           View all NFTs
