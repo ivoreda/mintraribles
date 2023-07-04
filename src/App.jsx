@@ -30,7 +30,7 @@ const App = () => {
         <Hero />
       </div>
       <Artworks />
-      <Transactions />
+      {/* <Transactions /> */}
       <Footer />
       <CreateNFT />
       <ShowNFT />

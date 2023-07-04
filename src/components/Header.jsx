@@ -23,15 +23,15 @@ const Header = () => {
         items-center flex-initial"
       >
         {/* <li className="mx-4 cursor-pointer">Market</li> */}
-        <Link to="/" className="mx-4 cursor-pointer">
+        <Link to="/" className="ml-48 cursor-pointer">
           Home
         </Link>
-        <Link to="/market" className="mx-4 cursor-pointer">
+        <Link to="/market" className="mr-24 cursor-pointer">
           View all NFTs
         </Link>
         {/* <li className="mx-4 cursor-pointer">Artist</li> */}
-        <li className="mx-4 cursor-pointer">Features</li>
-        <li className="mx-4 cursor-pointer">Community</li>
+        {/* <li className="mx-4 cursor-pointer">Features</li>
+        <li className="mx-4 cursor-pointer">Community</li> */}
       </ul>
 
       {connectedAccount ? (
