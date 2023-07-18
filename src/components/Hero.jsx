@@ -7,6 +7,9 @@ const Hero = () => {
   const onCreatedNFT = () => {
     setGlobalState("modal", "scale-100");
   };
+  {
+    console.log("mmy wallet address", connectedAccount);
+  }
 
   return (
     <div
@@ -28,23 +31,38 @@ const Hero = () => {
           className="flex mt-5 md:flex-[0.5] text-white md:flex list-none flex-row justify-between
         items-center flex-initial"
         >
-          <button
-            className="shadow-xl shadow-black text-white
-            bg-[#e32970] hover:bg-[#bd255f]
-            rounded-full cursor-pointer p-2"
-            onClick={onCreatedNFT}
-          >
-            Create NFT
-          </button>
+          {connectedAccount === 0x0860cea4eacffac1a1db5d2ea16d88f92ac4010a ? (
+            <button
+              className="shadow-xl shadow-black text-white
+bg-[#e32970] hover:bg-[#bd255f]
+rounded-full cursor-pointer p-2"
+              onClick={onCreatedNFT}
+            >
+              Create NFT
+            </button>
+          ) : (
+            <Link
+              to="/market"
+              className="shadow-xl shadow-black text-white
+bg-[#e32970] hover:bg-[#bd255f]
+rounded-full cursor-pointer p-2"
+            >
+              View all NFTs
+            </Link>
+          )}
 
-          <Link
-            to="/market"
-            className="shadow-xl shadow-black text-white
-            bg-[#e32970] hover:bg-[#bd255f]
-            rounded-full cursor-pointer p-2"
-          >
-            View all NFTs
-          </Link>
+          {connectedAccount === 0x0860cea4eacffac1a1db5d2ea16d88f92ac4010a ? (
+            <Link
+              to="/market"
+              className="shadow-xl shadow-black text-white
+bg-[#e32970] hover:bg-[#bd255f]
+rounded-full cursor-pointer p-2"
+            >
+              View all NFTs
+            </Link>
+          ) : (
+            <></>
+          )}
         </div>
 
         <div className="w-3/4 flex justify-between items-center mt-5">
