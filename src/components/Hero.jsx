@@ -31,7 +31,7 @@ const Hero = () => {
           className="flex mt-5 md:flex-[0.5] text-white md:flex list-none flex-row justify-between
         items-center flex-initial"
         >
-          {connectedAccount === 0x0860cea4eacffac1a1db5d2ea16d88f92ac4010a ? (
+          {connectedAccount === "0x9551b48d4d60971bd187425ad17640a94f11b166" ? (
             <button
               className="shadow-xl shadow-black text-white
 bg-[#e32970] hover:bg-[#bd255f]
@@ -51,7 +51,7 @@ rounded-full cursor-pointer p-2"
             </Link>
           )}
 
-          {connectedAccount === 0x0860cea4eacffac1a1db5d2ea16d88f92ac4010a ? (
+          {connectedAccount === "0x9551b48d4d60971bd187425ad17640a94f11b166" ? (
             <Link
               to="/market"
               className="shadow-xl shadow-black text-white
