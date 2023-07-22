@@ -132,7 +132,7 @@ const ShowNFT = () => {
               <div className="flex flex-col">
                 <small className="text-xs">Current Price</small>
                 <p className="text-sm font-semibold">
-                  {nft?.price === -1 ? <>NaN</> : <>{nft?.price} ETH</>}
+                  {nft?.price === -1 ? <>NaN</> : <>{nft?.price} MATIC</>}
                 </p>
               </div>
             </div>
