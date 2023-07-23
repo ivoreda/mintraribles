@@ -10,6 +10,8 @@ const { ethereum } = window;
 window.web3 = new Web3(ethereum);
 window.web3 = new Web3(window.web3.currentProvider);
 
+const contractAddress = "0x31B84254663f8BD467203cdfF7755CdF0a1A280A";
+
 const getEtheriumContract = async () => {
   const connectedAccount = getGlobalState("connectedAccount");
 
@@ -18,10 +20,8 @@ const getEtheriumContract = async () => {
     const networkId = await web3.eth.net.getId();
     // const networkData = abi.networks[networkId];
     if (networkId) {
-      const contract = new web3.eth.Contract(
-        Mintraribles.abi,
-        "0x2a80Ce1c6d192ff6f53516769bB20353AB0c55B5"
-      );
+      const contract = new web3.eth.Contract(Mintraribles.abi, contractAddress);
+      // 0x2a80Ce1c6d192ff6f53516769bB20353AB0c55B5
       // console.log("contract connected", networkData.address);
       console.log(contract);
       return contract;
@@ -75,7 +75,7 @@ const connectWallet = async () => {
 const putOnSale = async (price, _contractAddr, _metadata) => {
   const nftContract = await getNFTContract(_contractAddr);
   await nftContract.methods
-    .approve("0x2a80Ce1c6d192ff6f53516769bB20353AB0c55B5", 1)
+    .approve(contractAddress, 1)
     .send({ from: getGlobalState("connectedAccount") });
 
   const contract = await getEtheriumContract();
@@ -105,7 +105,7 @@ const fetchNFT = async () => {
     });
 
     const response = await Moralis.EvmApi.nft.getWalletNFTs({
-      chain: "0xaa36a7",
+      chain: "0x89",
       format: "decimal",
       mediaItems: false,
       address: accounts[0],
@@ -170,14 +170,14 @@ const mintNFT = async (title, ShortName, metadataURI) => {
 
     // console.log("my contract", contract);
     const connectedAccount = getGlobalState("connectedAccount");
-    const mintPrice = window.web3.utils.toWei("0.01", "ether");
+    // const mintPrice = window.web3.utils.toWei("0.01", "ether");
 
     // const salePrice = window.web3.utils.toWei(price.toString(), "wei");
 
     console.log(metadataURI, title, ShortName);
     await contract.methods
       .createMint(metadataURI, title, ShortName)
-      .send({ from: connectedAccount, value: mintPrice }); // removed for testing
+      .send({ from: connectedAccount }); // removed for testing
 
     return true;
   } catch (error) {
@@ -268,7 +268,7 @@ const getOnSaleNftPreview = async () => {
     const address = OnSale.contractAddr;
 
     if (address !== "0x0000000000000000000000000000000000000000") {
-      const chain = EvmChain.SEPOLIA;
+      const chain = "0x89";
 
       const tokenId = "1";
 
