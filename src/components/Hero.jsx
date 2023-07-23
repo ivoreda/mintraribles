@@ -31,7 +31,7 @@ const Hero = () => {
           className="flex mt-5 md:flex-[0.5] text-white md:flex list-none flex-row justify-between
         items-center flex-initial"
         >
-          {connectedAccount === "0x0860CEa4EacFfAc1A1Db5D2eA16d88f92aC4010A" ? (
+          {connectedAccount === "0x9551b48d4d60971bd187425ad17640a94f11b166" ? (
             <button
               className="shadow-xl shadow-black text-white
 bg-[#e32970] hover:bg-[#bd255f]
@@ -51,7 +51,7 @@ rounded-full cursor-pointer p-2"
             </Link>
           )}
 
-          {connectedAccount === "0x0860CEa4EacFfAc1A1Db5D2eA16d88f92aC4010A" ? (
+          {connectedAccount === "0x9551b48d4d60971bd187425ad17640a94f11b166" ? (
             <Link
               to="/market"
               className="shadow-xl shadow-black text-white
@@ -67,7 +67,7 @@ rounded-full cursor-pointer p-2"
 
         <div className="w-3/4 flex justify-between items-center mt-5">
           <div>
-            <p className="text-white font-bold">1231k</p>
+            <p className="text-white font-bold">175k</p>
             <small className="text-gray-300">User</small>
           </div>
           <div>
@@ -75,7 +75,7 @@ rounded-full cursor-pointer p-2"
             <small className="text-gray-300">Artwork</small>
           </div>
           <div>
-            <p className="text-white font-bold">200k</p>
+            <p className="text-white font-bold">100k</p>
             <small className="text-gray-300">Artist</small>
           </div>
         </div>

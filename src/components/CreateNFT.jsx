@@ -37,9 +37,11 @@ const CreateNFT = () => {
   const [cid, setCid] = useState("");
   const [File, setFile] = useState();
   const pinataEndpoint = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-  const pinataApiKey = "52d458d782bf2db34ec4";
+  const pinataApiKey = "433e5df9e4c015169ec7";
   const pinataSecretApiKey =
-    "bd7b807f96dc95793fd03e7a9fc2cc62680dc55ea8d3275bc5cc70ec55d8a76c";
+    "89bd7228892b534bdbe9261246493b516c8aa0e5bb2a27eb1aad20801afabd74";
+  const pinataJWT =
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJiZjE5YTFkMS01MDliLTQyYjQtODE0Ni03OWEyZDY1NDI5NTYiLCJlbWFpbCI6Iml2b3JlZGFmZWpAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJGUkExIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9LHsiaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6IjQzM2U1ZGY5ZTRjMDE1MTY5ZWM3Iiwic2NvcGVkS2V5U2VjcmV0IjoiODliZDcyMjg4OTJiNTM0YmRiZTkyNjEyNDY0OTNiNTE2YzhhYTBlNWJiMmEyN2ViMWFhZDIwODAxYWZhYmQ3NCIsImlhdCI6MTY4OTY4MzYyOX0.pYKUoc7o07HmVmJ9-1-r1__lmAe8BAiDrwAf3dU3fQY";
 
   async function uploadFileToPinata(file) {
     try {
@@ -52,6 +54,7 @@ const CreateNFT = () => {
           "Content-Type": "multipart/form-data",
           pinata_api_key: pinataApiKey,
           pinata_secret_api_key: pinataSecretApiKey,
+          Authorization: pinataJWT
         },
       });
 

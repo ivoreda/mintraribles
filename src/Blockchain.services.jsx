@@ -170,7 +170,7 @@ const mintNFT = async (title, ShortName, metadataURI) => {
 
     // console.log("my contract", contract);
     const connectedAccount = getGlobalState("connectedAccount");
-    const mintPrice = window.web3.utils.toWei("0.01", "ether");
+    const mintPrice = window.web3.utils.toWei("0.01", "ether"); // changed from 0.01
 
     // const salePrice = window.web3.utils.toWei(price.toString(), "wei");
 
