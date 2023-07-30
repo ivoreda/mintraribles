@@ -7,10 +7,6 @@ const Hero = () => {
   const onCreatedNFT = () => {
     setGlobalState("modal", "scale-100");
   };
-  {
-    console.log("mmy wallet address", connectedAccount);
-  }
-
   return (
     <div
       className="flex flex-col md:flex-row w-4/5 justify-between
@@ -31,37 +27,30 @@ const Hero = () => {
           className="flex mt-5 md:flex-[0.5] text-white md:flex list-none flex-row justify-between
         items-center flex-initial"
         >
-          {/* {connectedAccount === "0x8071B6cb42F5dF575FEaB37787ad43451c366dBf" ? ( */}
-          <button
-            className="shadow-xl shadow-black text-white
-bg-[#e32970] hover:bg-[#bd255f]
-rounded-full cursor-pointer p-2"
-            onClick={onCreatedNFT}
-          >
-            Create NFT
-          </button>
-
-          <Link
-            to="/market"
-            className="shadow-xl shadow-black text-white
-bg-[#e32970] hover:bg-[#bd255f]
-rounded-full cursor-pointer p-2"
-          >
-            View all NFTs
-          </Link>
-
-          {/* {connectedAccount === "0x8071B6cb42F5dF575FEaB37787ad43451c366dBf" ? (
+          {connectedAccount == 0x8071B6cb42F5dF575FEaB37787ad43451c366dBf ||
+          connectedAccount == 0x0860CEa4EacFfAc1A1Db5D2eA16d88f92aC4010A ? (
+            <>
+              <button
+                className="shadow-xl shadow-black text-white bg-[#e32970] hover:bg-[#bd255f] rounded-full cursor-pointer p-2"
+                onClick={onCreatedNFT}
+              >
+                Create NFT
+              </button>
+              <Link
+                to="/market"
+                className="shadow-xl shadow-black text-white bg-[#e32970] hover:bg-[#bd255f] rounded-full cursor-pointer p-2 ml-3"
+              >
+                View all NFTs
+              </Link>
+            </>
+          ) : (
             <Link
               to="/market"
-              className="shadow-xl shadow-black text-white
-bg-[#e32970] hover:bg-[#bd255f]
-rounded-full cursor-pointer p-2"
+              className="shadow-xl shadow-black text-white bg-[#e32970] hover:bg-[#bd255f] rounded-full cursor-pointer p-2"
             >
               View all NFTs
             </Link>
-          ) : (
-            <></>
-          )} */}
+          )}
         </div>
 
         <div className="w-3/4 flex justify-between items-center mt-5">
